@@ -7,6 +7,7 @@ class Program
     static void Main()
     {
         var generator = new Generator();
+        generator.GenerateTypeDump();
         generator.GenerateFunny();
         Console.WriteLine("Done!");
     }
@@ -18,6 +19,7 @@ internal class Generator
     private readonly string prefix = "[ProtoFluxBindings]FrooxEngine.ProtoFlux.Runtimes.Execution.Nodes";
     private readonly List<Type> types = new();
     private string funnyString = "|";
+    private string typeString = "";
 
     public Generator()
     {
@@ -55,6 +57,65 @@ internal class Generator
         }
     }
 
+    public void GenerateTypeDump()
+    {
+        try
+        {
+            var categoryNode = WorkerInitializer.ComponentLibrary.GetSubcategory("ProtoFlux/Runtimes/Execution/Nodes");
+            var categories = GetCategories(categoryNode).OrderBy(t => t.type.Name.Length);
+
+            foreach (var (type, isGeneric) in categories)
+            {
+                if (!isGeneric)
+                {
+                    continue;
+                }
+                else
+                {
+                    Type[] genericArgs = type.GetGenericArguments();
+
+
+                    IEnumerator<Type> enumerator = WorkerInitializer.GetCommonGenericTypes(type).GetEnumerator();
+                    typeString += type.ToString() + ": ";
+
+                    while (enumerator.MoveNext())
+                    {
+                        Type type2 = enumerator.Current;
+
+                        try
+                        {
+                            if (!type2.IsValidGenericType(true))
+                            {
+                                continue;
+                            }
+                            // if (!base.World.Types.IsSupported(type2))
+                            // {
+                            //     continue;
+                            // }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Generic Error: " + ex);
+                            continue;
+                        }
+
+                        typeString += type2.GetNiceName("<", ">", "+") + ", ";
+
+                    }
+                    typeString += "\n";
+
+                }
+            }
+
+            System.IO.File.WriteAllText("./typestring.txt", typeString);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
     private void InitializeAssembliesAndTypes()
     {
         var assemblies = new List<Assembly>
@@ -68,7 +129,14 @@ internal class Generator
             types.AddRange(assembly.GetTypes());
         }
 
-        var assemblyTypeRegistries = assemblies.Select(a => new AssemblyTypeRegistry(a, DataModelAssemblyType.Core)).ToList();
+        // Assembly mscorlib = typeof(Int16).Assembly;
+        // var coreTypes = mscorlib.GetTypes()
+        //             .Where(t => t.Namespace == "System");
+        // types.AddRange(coreTypes);
+
+        System.Console.WriteLine("Loaded types: " + types.Count());
+
+        List<AssemblyTypeRegistry> assemblyTypeRegistries = assemblies.Select(a => new AssemblyTypeRegistry(a, DataModelAssemblyType.Core)).ToList();
         InitializeAssemblies(typeManager, assemblyTypeRegistries);
     }
 

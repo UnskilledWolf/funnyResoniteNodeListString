@@ -1,3 +1,8 @@
+## Added this Fork:
++ Type String generation
+  + Format: `TypeName[E]: FriendlyTypeName<FriendlyGenericName>`
++ **Note: edit the .csproj file to point to your Resonate installation**
+
 ## Prerequisites
 
 - [.NET SDK](https://dotnet.microsoft.com/download)
