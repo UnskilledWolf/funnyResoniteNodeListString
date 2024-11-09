@@ -1,6 +1,6 @@
 ## Added this Fork:
 + Type String generation
-  + Format: `TypeName[E]: FriendlyTypeName<FriendlyGenericName>`
+  + Format: `TypeName[E]: FriendlyGenericName, ...,`
 + **Note: edit the .csproj file to point to your Resonate installation**
 
 ## Prerequisites

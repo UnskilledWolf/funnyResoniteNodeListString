@@ -99,7 +99,10 @@ internal class Generator
                             continue;
                         }
 
-                        typeString += type2.GetNiceName("<", ">", "+") + ", ";
+                        String niceName = type2.GetNiceName("<", "", "+");
+                        niceName = niceName.Substring(niceName.IndexOf("<") + 1);
+                        typeString += niceName + ", ";
+
 
                     }
                     typeString += "\n";
